@@ -135,7 +135,7 @@ readMPMData  <-  function(t1Files  = NULL,
               TR = TR,
               TE = TE,
               FA = FA)
-  class(obj) <- c("list", "MPMData")
+  class(obj) <- "MPMData"
   invisible(obj)
 }
 
@@ -306,6 +306,22 @@ medianFilterSigma <- function(obj,hsig=10,mask=NULL){
   obj
 }
 
+validate_MPMData = function(mpmdata) {
+  need_names = c("model", "nFiles", "t1Files",
+                 "maskfile", "mask",
+                 "ddata", "TE", "TR", "FA",
+                 "sdim")
+  n = names(mpmdata)
+  check = need_names %in% n
+  is_null = sapply(need_names, function(x) {
+    is.null(mpmdata[[x]])
+  })
+  if (!all(check) | any(is_null)) {
+    bad = need_names[!check | is_null]
+    bad = paste(bad, sep = ", ")
+    stop(paste0("These slots are not available: ", bad))
+  }
+}
 
 estimateESTATICS <- function (mpmdata,
                               TEScale = 100,
@@ -315,6 +331,8 @@ estimateESTATICS <- function (mpmdata,
                               L = 1,
                               maxR2star=50,
                               verbose = TRUE) {
+
+  # validate_MPMData(mpmdata)
 
   ## create the design matrix of the model
   if (mpmdata$model == 2) {
