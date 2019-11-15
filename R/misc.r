@@ -1,28 +1,3 @@
-extract.default <- function(x, ...) awsMethods::extract(x)
-extract.MPMData <- function(x,what, ...){
-  onames <- names(x)
-  select <- what[what %in% onames]
-  # return single component or list with selected components
-  invisible(if(length(select)==1) x[[select]] else x[select])
-}
-
-extract.ESTATICSModel <- function(x,what, ...){
-  onames <- names(x)
-  select <- what[what %in% onames]
-  invisible(if(length(select)==1) x[[select]] else x[select])
-}
-
-extract.sESTATICSModel <- function(x,what, ...){
-  onames <- names(x)
-  select <- what[what %in% onames]
-  invisible(if(length(select)==1) x[[select]] else x[select])
-}
-
-extract.qMaps <- function(x,what, ...){
-  onames <- names(x)
-  select <- what[what %in% onames]
-  invisible(if(length(select)==1) x[[select]] else x[select])
-}
 
 
 hg1f1 <- function(a, b, z){
@@ -59,7 +34,57 @@ getnlspars <- function (object) {
   XtX <- t(Rmat)%*%Rmat
   dimnames(XtX) <- list(pnames, pnames)
   ans <- list(formula = formula(object), residuals = r, sigma = sqrt(resvar),
-              df = c(p, rdf), XtX = XtX, call = object$call,
+              df = c(p, rdf), XtX = XtX, invCov = XtX/resvar, call = object$call,
+              convInfo = object$convInfo, control = object$control,
+              na.action = object$na.action, coefficients = param)
+  ans
+}
+
+setMPMmask <- function(mpmData,mask){
+   if(any(dim(mask)!=mpmData$sdim)||!is.logical(mask)){
+      warning("can't set new mask returning old mpmData object \n")
+      return(mpmData)
+   }
+   ddata <- extract(mpmData,"ddata")
+   dim(ddata) <- c(mpmData$nFiles,prod(mpmData$sdim))
+   mpmData$ddata <- ddata[,mask]
+   mpmData$mask <- mask
+   mpmData$maskFile <- "none"
+   mpmData
+}
+
+getnlspars2 <- function (object, sigma, ind) {
+#
+#   using variance estimates from data instead of RSS
+#
+  r <- as.vector(object$m$resid())
+  w <- object$weights
+  n <- if (!is.null(w))
+    sum(w > 0)
+  else length(r)
+  param <- coef(object)
+  pnames <- names(param)
+  p <- length(param)
+  rdf <- n - p
+  resvar <- if (rdf <= 0)
+    NaN
+  else deviance(object)/rdf
+  grad <- object$m$gradient()
+  XtX <- t(grad)%*%grad
+  sgrad <- sigma[ind] * grad
+  z <- svd(sgrad)
+  if(any(z$d<1e-6*max(z$d))){
+     cat("singular covariance\ngradient:\n")
+     print(grad)
+     cat("sigma\n")
+     print(sigma[ind])
+  }
+  z$d <- pmax(z$d,1e-6*max(z$d))
+  sXtXinv <- z$v%*%diag(1/z$d^2)%*%t(z$v)
+  XtXsinv <- XtX%*%sXtXinv%*%XtX
+  dimnames(XtX) <- list(pnames, pnames)
+  ans <- list(formula = formula(object), residuals = r, sigma = sqrt(resvar),
+              df = c(p, rdf), XtX = XtX, invCov=XtXsinv,call = object$call,
               convInfo = object$convInfo, control = object$control,
               na.action = object$na.action, coefficients = param)
   ans

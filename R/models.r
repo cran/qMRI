@@ -55,9 +55,9 @@ estatics1 <- function(par, design){
                 as.double(design),
                 as.integer(n),
                 fval = double(n),
-                grad = double(3*n))[c("fval", "grad")]
+                grad = double(2*n))[c("fval", "grad")]
   fval <- z$fval
-  attr(fval, "gradient") <- matrix(z$grad, n, 3)
+  attr(fval, "gradient") <- matrix(z$grad, n, 2)
   fval
 }
 
@@ -119,9 +119,9 @@ estatics1fixedR2 <- function(par, R2star, design){
                 as.double(design),
                 as.integer(n),
                 fval = double(n),
-                grad = double(2*n))[c("fval", "grad")]
+                grad = double(n))[c("fval", "grad")]
   fval <- z$fval
-  attr(fval, "gradient") <- matrix(z$grad, n, 2)
+  attr(fval, "gradient") <- matrix(z$grad, n, 1)
   fval
 }
 
@@ -135,6 +135,7 @@ estatics3QL <- function(par, design, CL, sig, L){
   ## S_{MT} = par[2] * exp(- par[4] * TE)
   ## S_{PD} = par[3] * exp(- par[4] * TE)
   ##
+  par <- pmax(0,par)
   n <- dim(design)[1]
   if(par[4] > 20) par[4] <- 20
   z <- .Fortran(C_estatics3,
@@ -175,6 +176,7 @@ estatics2QL <- function(par, design, CL, sig, L){
   ## S_{T1} = par[1] * exp(- par[3] * TE)
   ## S_{PD} = par[2] * exp(- par[3] * TE)
   ##
+  par <- pmax(0,par)
   n <- dim(design)[1]
   z <- .Fortran(C_estatics2,
                 as.double(par),
@@ -203,6 +205,8 @@ estatics1QL <- function(par, design, CL, sig, L){
   ##
   ## S_{T1} = par[1] * exp(- par[2] * TE)
   ##
+  par <- pmax(0,par)
+
   n <- dim(design)[1]
   z <- .Fortran(C_estatics1,
                 as.double(par),
@@ -327,8 +331,7 @@ ESTATICS.confidence <- function(theta,si2,aT1,aPD,TR=1,df=NULL,alpha=0.05){
 
 initth <- function(mpmdata, TEScale=100, dataScale=100){
   ## get initial estimates for ESTATICS parameters
-  mask <- mpmdata$mask
-  nvox <- prod(mpmdata$sdim)
+  nvox <- sum(mpmdata$mask)
   TE <- mpmdata$TE/TEScale
   if(mpmdata$model==2){
      nT1 <- length(mpmdata$t1Files)
@@ -338,17 +341,16 @@ initth <- function(mpmdata, TEScale=100, dataScale=100){
      nPD <- length(mpmdata$pdFiles)
      indPD <- nT1+nMT+c(1,nPD)
      th <- matrix(0,4,nvox)
-     T1 <- matrix(mpmdata$ddata[indT1,,,],2,nvox)[,mask]/dataScale
-     MT <- matrix(mpmdata$ddata[indMT,,,],2,nvox)[,mask]/dataScale
-     PD <- matrix(mpmdata$ddata[indPD,,,],2,nvox)[,mask]/dataScale
-     R2star <- pmax(1e-6,((log(T1[1,])-log(T1[2,]))/diff(TE[indT1])+
+     T1 <- matrix(mpmdata$ddata[indT1,],2,nvox)/dataScale
+     MT <- matrix(mpmdata$ddata[indMT,],2,nvox)/dataScale
+     PD <- matrix(mpmdata$ddata[indPD,],2,nvox)/dataScale
+     R2star <- pmax(1e-2,((log(T1[1,])-log(T1[2,]))/diff(TE[indT1])+
              (log(MT[1,])-log(MT[2,]))/diff(TE[indMT])+
              (log(PD[1,])-log(PD[2,]))/diff(TE[indPD]))/3)
-     th[1,mask] <- T1[1,]*exp(R2star*TE[1])
-     th[2,mask] <- MT[1,]*exp(R2star*TE[nT1+1])
-     th[3,mask] <- PD[1,]*exp(R2star*TE[nT1+nMT+1])
-     th[4,mask] <- R2star
-     dim(th) <- c(4,mpmdata$sdim)
+     th[1,] <- T1[1,]*exp(R2star*TE[1])
+     th[2,] <- MT[1,]*exp(R2star*TE[nT1+1])
+     th[3,] <- PD[1,]*exp(R2star*TE[nT1+nMT+1])
+     th[4,] <- R2star
   }
   if(mpmdata$model==1){
      nT1 <- length(mpmdata$t1Files)
@@ -356,43 +358,70 @@ initth <- function(mpmdata, TEScale=100, dataScale=100){
      n2 <- length(mpmdata$pdFiles)
      ind2 <- c(nT1+1,mpmdata$nFiles)
      th <- matrix(0,3,nvox)
-     T1 <- matrix(mpmdata$ddata[indT1,,,],2,nvox)[,mask]/dataScale
-     S <- matrix(mpmdata$ddata[ind2,,,],2,nvox)[,mask]/dataScale
-     R2star <- pmax(0,((log(T1[1,])-log(T1[2,]))/diff(TE[indT1])+
+     T1 <- matrix(mpmdata$ddata[indT1,],2,nvox)/dataScale
+     S <- matrix(mpmdata$ddata[ind2,],2,nvox)/dataScale
+     R2star <- pmax(1e-2,((log(T1[1,])-log(T1[2,]))/diff(TE[indT1])+
              (log(S[1,])-log(S[2,]))/diff(TE[ind2]))/2)
-     th[1,mask] <- T1[1,]*exp(R2star*TE[1])
-     th[2,mask] <- S[1,]*exp(R2star*TE[nT1+1])
-     th[3,mask] <- R2star
-     dim(th) <- c(3,mpmdata$sdim)
+     th[1,] <- T1[1,]*exp(R2star*TE[1])
+     th[2,] <- S[1,]*exp(R2star*TE[nT1+1])
+     th[3,] <- R2star
   }
   if(mpmdata$model==0){
      nT1 <- mpmdata$nFiles
      indT1 <- c(1,nT1)
      th <- matrix(0,2,nvox)
-     T1 <- matrix(mpmdata$ddata[indT1,,,],2,nvox)[,mask]/dataScale
-     R2star <- pmax(0,(log(T1[1,])-log(T1[2,]))/diff(TE[indT1]))
-     th[1,mask] <- T1[1,]*exp(R2star*TE[1])
-     th[2,mask] <- R2star
-     dim(th) <- c(2,mpmdata$sdim)
+     T1 <- matrix(mpmdata$ddata[indT1,],2,nvox)/dataScale
+     R2star <- pmax(1e-2,(log(T1[1,])-log(T1[2,]))/diff(TE[indT1]))
+     th[1,] <- T1[1,]*exp(R2star*TE[1])
+     th[2,] <- R2star
   }
   th
 }
 
-linearizedESTATICS <- function(ivec, xmat, maxR2star){
+linearizedESTATICS <- function(ivec, xmat, maxR2star, wghts){
     dimx <- dim(xmat)
     npar <- dimx[2]
     invcov <- matrix(0,npar,npar)
-    z <- lm.fit(xmat,log(ivec))
+    z <- lm.wfit(xmat,log(ivec),wghts)
     R2star <- -z$coefficients[npar]
-    sigma2R2s <- sum(z$residuals^2)/(-diff(dimx))
+    sigma2R2s <- sum(z$residuals^2*wghts)/(-diff(dimx))/mean(wghts)
     invcov[npar,npar] <- sum(xmat[,npar]^2)/sigma2R2s
-    if (R2star < 0){
-      R2star <- 0
+    if (R2star < 0.001){
+      R2star <- 0.001
       invcov[npar,npar] <- 0
 #  boundary of parameter space no reliable confidence information
     }
     if (R2star > maxR2star){
-      R2star <- 0
+      R2star <- maxR2star
+      invcov[npar,npar] <- 0
+#  boundary of parameter space no reliable confidence information
+    }
+    xmat0 <- xmat[,-npar,drop=FALSE]*exp(-R2star*xmat[,npar])
+    z <- lm.fit(xmat0,ivec)
+    theta <- z$coefficients
+    sigma2 <- sum(z$residuals^2)/(-diff(dimx)+1)
+    invcov[-npar,-npar] <- t(xmat0)%*%diag(wghts)%*%xmat0/sigma2
+    list(theta=theta, R2star=R2star, invCov=invcov, sigma2 = sigma2, xmat=xmat0)
+}
+
+linearizedESTATICS2 <- function(ivec, xmat, maxR2star, sigma, ind, wghts){
+  #
+  #   using variance estimates from data instead of RSS
+  #
+    dimx <- dim(xmat)
+    npar <- dimx[2]
+    invcov <- matrix(0,npar,npar)
+    z <- lm.wfit(xmat,log(ivec),wghts)
+    R2star <- -z$coefficients[npar]
+    XtXR2s <- sum(wghts*xmat[,npar]^2)
+    invcov[npar,npar] <- XtXR2s^2/sum(xmat[,npar]^2*sigma[ind]^2)
+    if (R2star < 0.001){
+      R2star <- 0.001
+      invcov[npar,npar] <- 0
+#  boundary of parameter space no reliable confidence information
+    }
+    if (R2star > maxR2star){
+      R2star <- maxR2star
       invcov[npar,npar] <- 0
 #  boundary of parameter space no reliable confidence information
     }
@@ -400,6 +429,7 @@ linearizedESTATICS <- function(ivec, xmat, maxR2star){
     z <- lm.fit(xmat0,ivec)
     theta <- z$coefficients
     sigma2 <- sum(z$residuals^2)/(-diff(dimx)+1)
-    invcov[-npar,-npar] <- t(xmat0)%*%xmat0/sigma2
+    XtX0 <- t(xmat0)%*%xmat0
+    invcov[-npar,-npar] <- XtX0%*%solve(t(xmat0)%*%diag(sigma[ind]^2/wghts)%*%xmat0)%*%XtX0
     list(theta=theta, R2star=R2star, invCov=invcov, sigma2 = sigma2, xmat=xmat0)
 }
