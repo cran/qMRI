@@ -55,6 +55,9 @@ Quantitative multi-parameter mapping of R1, PD(*), MT, and R2(*) at 3T:
 a multi-center validation. Front Neurosci,
 Wellcome Trust Centre for Neuroimaging, UCL Institute of Neurology,
 University College London, UK., 2013, 7, 95
+
+J. Polzehl, K. Tabelow (2019). Magnetic Resonance Brain Imaging:
+Modeling and Data Analysis Using R. Springer, Use R! series. Doi:10.1007/978-3-030-29184-6.
 }
 \author{
 Karsten Tabelow \email{tabelow@wias-berlin.de}\cr
@@ -66,7 +69,7 @@ J\"org Polzehl \email{polzehl@wias-berlin.de}
 \seealso{
 \code{\link{readMPMData}}, \code{\link{estimateESTATICS}},
 \code{\link{smoothESTATICS}}, \code{\link{writeESTATICS}},
-\code{\link[dti]{awslsigmc}}
+\code{\link[aws]{awsLocalSigma}}
 }
 \keyword{ models }% use one of  RShowDoc("KEYWORDS")
 

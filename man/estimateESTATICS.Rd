@@ -45,7 +45,7 @@ estimateESTATICS(mpmdata, TEScale = 100, dataScale = 1000, method = c("NLR", "QL
 \item{varest}{
   For parameter covariance estimation use either residual sum of squares (RSS)
   or estimate variances for T1, MT (is available) and PD from higest intensity
-  images using function \code{awslsigmc}from package \pkg{dti}.
+  images using function \code{awsLocalSigma}from package \pkg{aws}.
 }
   \item{verbose}{
    logical: Monitor process.
@@ -81,6 +81,10 @@ Ooi, C.; Bullmore, E. T. & Lutti, A. Quantitative multi-parameter mapping of R1,
 PD(*), MT, and R2(*) at 3T: a multi-center validation. Front Neurosci,
 Wellcome Trust Centre for Neuroimaging, UCL Institute of Neurology,
 University College London, UK., 2013, 7, 95
+
+J. Polzehl, K. Tabelow (2019). Magnetic Resonance Brain Imaging:
+Modeling and Data Analysis Using R. Springer, Use R! series. Doi:10.1007/978-3-030-29184-6.
+
 }
 \author{
 Karsten Tabelow \email{tabelow@wias-berlin.de}\cr
@@ -90,7 +94,7 @@ J\"org Polzehl \email{polzehl@wias-berlin.de}
 \seealso{
 \code{\link{readMPMData}}, \code{\link{calculateQI}},
 \code{\link{smoothESTATICS}}, \code{\link{writeESTATICS}},
-\code{\link[dti]{awslsigmc}}
+\code{\link[aws]{awsLocalSigma}}
 }
 \examples{
 \donttest{

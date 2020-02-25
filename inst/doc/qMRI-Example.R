@@ -87,7 +87,7 @@ modelMPMQL <- estimateESTATICS(mpm,
 
 
 ###################################################
-### code chunk number 10: qMRI-Example.Rnw:230-233 (eval = FALSE)
+### code chunk number 10: qMRI-Example.Rnw:236-239 (eval = FALSE)
 ###################################################
 ## ddata <- extract(mpm,"ddata")
 ## mask <- extract(mpm,"mask")
@@ -95,7 +95,7 @@ modelMPMQL <- estimateESTATICS(mpm,
 
 
 ###################################################
-### code chunk number 11: 7 (eval = FALSE)
+### code chunk number 11: 7b (eval = FALSE)
 ###################################################
 ## # use setCores(ncores) to enable openMP parallelization
 ## setCores(2,reprt=FALSE)
