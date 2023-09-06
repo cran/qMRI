@@ -176,14 +176,14 @@ estimateSigma <- function(magnitude,phase,mask,kstar=20,kmin=8,hsig=5,lambda=12,
 }
 
 medianFilterSigma <- function(obj,hsig=10,mask=NULL){
-  if(class(obj)=="sigmaEstSENSE"){
+  if(inherits(obj, "sigmaEstSENSE")){
     sigma2 <- obj$sigmal^2
     mask <- obj$mask
   } else {
     sigma2 <- obj^2
   }
-  sigma2hat <- aws::medianFilter3D(sigma2, h=hsig, mask=mask)
-  if(class(obj)=="sigmaEstSENSE"){
+  sigma2hat <- aws::medianFilter3D(sigma2, h=hsig, mask=mask)/0.6931
+  if(inherits(obj, "sigmaEstSENSE")){
     obj$sigma <- sqrt(sigma2hat)
     obj$hsig <- hsig
   } else {
@@ -221,7 +221,9 @@ estimateESTATICS <- function (mpmdata,
                               verbose = TRUE) {
 
   # validate_MPMData(mpmdata)
-  nvoxel <- sum(mpmdata$mask)
+  mask <- mpmdata$mask
+  sdim <- mpmdata$sdim
+  nvoxel <- sum(mask)
   method <- method[1]
   varest <- varest[1]
   ## create the design matrix of the model
@@ -268,18 +270,21 @@ estimateESTATICS <- function (mpmdata,
      sind <- switch(modelp1,rep(1,nT1), c(rep(1,nT1),rep(2,nPD)),
                                 c(rep(1,nT1), rep(2,nMT), rep(3,nPD)))
      ddata <- extract(mpmdata,"ddata")[ind,,,,drop=FALSE]
-     shat <- ddata
+     shat <- ddata[ind,,,]
      for( i in 1:modelp1){
-        shat[i,,,] <- aws::awsLocalSigma(ddata[i,,,], steps=16,
-            mask=extract(mpmdata,"mask"), ncoils=1, hsig=2.5,
+        shat[i,,,] <- aws::awsLocalSigma(ddata[ind[i],,,], steps=16,
+            mask=extract(mpmdata,"mask"), ncoils=L, hsig=2.5,
             lambda=6,family="Gauss")$sigma
      }
-     dim(shat) <- c(modelp1,prod(mpmdata$sdim))
-     shat <- shat[,mpmdata$mask]
+     dim(shat) <- c(modelp1,prod(sdim))
+     shat <- shat[,mask]
      shat[shat==0] <- quantile(shat,.8)
+     if(is.null(sigma)) sigma <- median(shat)
      shat <- shat/dataScale
-  } else shat <- NULL
-
+   } else {
+      shat <- array(0,c(modelp1,nvoxel))
+      sind <- NULL
+    }
   ## obbtain initial estimates from linearized model
   thetas <- initth(mpmdata, TEScale, dataScale)
   ## now only contains estimates for voxel in mask
@@ -294,14 +299,18 @@ estimateESTATICS <- function (mpmdata,
       homsigma <- TRUE
       sig <- sigma
       CL <- CLarray
-    } else if (all(dim(sigma) == mpmdata$sdim)) {
+    } else if (all(dim(sigma) == sdim)) {
       homsigma <- FALSE
+      sigma <- sigma[mask]
+      CLarray <- CLarray[mask]
+    ## only need values within mask
     } else {
       stop("Dimension of argument sigma does not match the data")
     }
-    sigma <- sigma[mpmdata$mask]
-    CLarray <- CLarray[mpmdata$mask]
-    ## only need values within mask
+  } else {
+  # not used
+     sigma <- 1
+     CLarray <- 1
   }
 
   ## create inde vectors for the data with different weighting (T1w, MTw, PDw)
@@ -327,8 +336,29 @@ estimateESTATICS <- function (mpmdata,
 
   if (verbose){
      cat("Start estimation in", nvoxel, "voxel at", format(Sys.time()), "\n")
-     pb <- txtProgressBar(0, nvoxel, style = 3)
+     if(setCores()==1) pb <- txtProgressBar(0, nvoxel, style = 3)
    }
+if( setCores() >1){
+        x <- array(0,c(mpmdata$nFiles+npar+modelp1+2,nvoxel))
+        x[mpmdata$nFiles+1:npar,] <- thetas
+        x[1:mpmdata$nFiles,] <- mpmdata$ddata/dataScale
+        x[mpmdata$nFiles+npar+1:modelp1,] <- shat
+        x[mpmdata$nFiles+npar+modelp1+1,] <- sigma
+        x[mpmdata$nFiles+npar+modelp1+2,] <- CLarray
+ #       ergs <- array(0, c(npar+npar*npar+2,nvoxel))
+       ergs <- switch(mpmdata$model+1,plmatrix(x,pEstESTATICS0,method,varest,
+                                     xmat,wghts,maxR2star,L,lower,upper,sind),
+                   plmatrix(x,pEstESTATICS1,method,varest,
+                                     xmat,wghts,maxR2star,L,lower,upper,sind),
+                   plmatrix(x,pEstESTATICS2,method,varest,
+                                     xmat,wghts,maxR2star,L,lower,upper,sind))
+        isConv <- ergs[npar+npar*npar+1,]
+        modelCoeff <- ergs[1:npar, ]
+        invCov <- ergs[npar+1:(npar*npar), ]
+        dim(invCov) <- c(npar,npar,nvoxel)
+        rsigma <- ergs[npar+npar*npar+2,]
+
+} else {
   for(xyz in 1:nvoxel){
 
           if (method == "QL") {
@@ -357,7 +387,7 @@ estimateESTATICS <- function (mpmdata,
                          weights = wghts,
                          control = list(maxiter = 200,
                                         warnOnly = TRUE)))
-            if (class(res) == "try-error"){
+            if (inherits(res, "try-error")){
 # retry with port algorithm and bounds
               th <- pmin(upper,pmax(lower,th))
               res <- if (method == "NLR") try(nls(ivec ~ estatics3(par, xmat),
@@ -396,7 +426,7 @@ estimateESTATICS <- function (mpmdata,
                          weights = wghts,
                          control = list(maxiter = 200,
                                         warnOnly = TRUE)))
-            if (class(res) == "try-error"){
+            if (inherits(res, "try-error")){
              # retry with port algorithm and bounds
                   th <- pmin(upper,pmax(lower,th))
                   res <- if (method == "NLR") try(nls(ivec ~ estatics2(par, xmat),
@@ -435,7 +465,7 @@ estimateESTATICS <- function (mpmdata,
                          weights = wghts,
                          control = list(maxiter = 200,
                                         warnOnly = TRUE)))
-             if (class(res) == "try-error"){
+             if (inherits(res, "try-error")){
 # retry with port algorithm and bounds
                  th <- pmin(upper,pmax(lower,th))
                  res <- if (method == "NLR") try(nls(ivec ~ estatics1(par, xmat),
@@ -461,7 +491,7 @@ estimateESTATICS <- function (mpmdata,
               }
           }
 
-          if (class(res) != "try-error") {
+          if (!inherits(res, "try-error")) {
             sres <- if(varest=="RSS") getnlspars(res) else
                  getnlspars2(res, shat[, xyz], sind )
             isConv[xyz] <- as.integer(res$convInfo$isConv)
@@ -472,7 +502,7 @@ estimateESTATICS <- function (mpmdata,
             }
           }
 
-          if (class(res) == "try-error" || coef(res)[npar] > maxR2star || coef(res)[npar] < 0) {
+          if (inherits(res, "try-error") || coef(res)[npar] > maxR2star || coef(res)[npar] < 0) {
 
             ## fallback for not converged or R2star out of range
             sres <- if(varest=="RSS") linearizedESTATICS(ivec, xmat, maxR2star, wghts) else
@@ -529,7 +559,7 @@ estimateESTATICS <- function (mpmdata,
                                control = list(maxiter = 200,
                                               warnOnly = TRUE),
                                lower=lower[1], upper=upper[1]))
-              if (class(res) != "try-error") {
+              if (!inherits(res,"try-error")) {
                 isConv[xyz] <- as.integer(res$convInfo$isConv)
                 sres <- getnlspars(res)
                 modelCoeff[-npar, xyz] <- sres$coefficients
@@ -539,15 +569,17 @@ estimateESTATICS <- function (mpmdata,
                   rsigma[xyz] <- sres$sigma
                 }
               } else {
-                mpmdata$mask[xyz] <- FALSE
+                posxyz <- ((1:prod(sdim))[mask])[xyz]
+                mask[posxyz] <- FALSE
               }
             }
           }#fallback
 #    if (verbose) if(xyz%/%10000*10000==xyz) cat("completed", xyz, "of", nvoxel, "voxel  time", format(Sys.time()), "\n")
 if (verbose) if(xyz%/%1000*1000==xyz) setTxtProgressBar(pb, xyz)
   }#z
+  }
   if (verbose){
-    close(pb)
+    if(setCores()==1) close(pb)
     cat("Finished estimation", format(Sys.time()), "\n")
   }
 
@@ -556,14 +588,14 @@ if (verbose) if(xyz%/%1000*1000==xyz) setTxtProgressBar(pb, xyz)
               rsigma = rsigma,
               isThresh = isThresh,
               isConv = isConv,
-              sdim = mpmdata$sdim,
+              sdim = sdim,
               nFiles = mpmdata$nFiles,
               t1Files = mpmdata$t1Files,
               pdFiles = mpmdata$pdFiles,
               mtFiles = mpmdata$mtFiles,
               model = mpmdata$model,
               maskFile = mpmdata$maskFile,
-              mask = mpmdata$mask,
+              mask = mask,
               sigma = sigma,
               shat = shat, ## sigma estimated from
               L = L,
@@ -582,6 +614,7 @@ smoothESTATICS <- function(mpmESTATICSModel,
                            kstar = 16,
                            alpha = 0.025,
                            patchsize = 0,
+                           mscbw = 5,
                            wghts = NULL,
                            verbose = TRUE) {#1
   ##
@@ -611,10 +644,18 @@ smoothESTATICS <- function(mpmESTATICSModel,
   #  factor 2 (analog to 2 sigma in KL) to have more common values for alpha
   #  factor for patchsizes adjusted using simulated data
   if(verbose) cat("using lambda=", lambda, " patchsize=", patchsize,"\n")
-
-  zobj <- aws::vpawscov2(mpmESTATICSModel$modelCoeff,
+  invCov <- extract(mpmESTATICSModel,"invCov")
+  if(mscbw>0){
+     rsdx <- extract(mpmESTATICSModel,"rsigma")^2
+     rsdhat <- medianFilter3D(rsdx,mscbw,mask)
+     rsdhat[!mask] <- mean(rsdhat[mask])
+     invCov <- sweep(invCov,3:5,rsdx/rsdhat,"*")
+  }
+  dim(invCov) <- c(nv,nv,prod(sdim))
+  invCov <- invCov[,,mask]
+  zobj <- vpawscov2(mpmESTATICSModel$modelCoeff,
                    kstar,
-                   mpmESTATICSModel$invCov,
+                   invCov,
                    mask,
                    lambda = lambda,
                    wghts = wghts,
@@ -627,7 +668,7 @@ smoothESTATICS <- function(mpmESTATICSModel,
                  isConv = mpmESTATICSModel$isConv,
                  rsigma = mpmESTATICSModel$rsigma,
                  bi = zobj$bi,
-                 smoothPar = c(zobj$lambda, zobj$hakt, alpha, patchsize),
+                 smoothPar = c(zobj$lambda, zobj$hakt, alpha, patchsize, mscbw),
                  smoothedData = zobj$data,
                  sdim = mpmESTATICSModel$sdim,
                  nFiles = mpmESTATICSModel$nFiles,

@@ -1,15 +1,15 @@
 Package: qMRI
 Type: Package
 Title: Methods for Quantitative Magnetic Resonance Imaging ('qMRI')
-Version: 1.2
-Date: 2020-02-20
+Version: 1.2.6
+Date: 2023-09-06
 Authors@R: c(person("Joerg", "Polzehl", role = c("aut"),
                     email = "joerg.polzehl@wias-berlin.de"),
              person("Karsten", "Tabelow", role = c("aut", "cre"),
                     email = "karsten.tabelow@wias-berlin.de"),
              person("WIAS Berlin", role = c("cph", "fnd")))
 Maintainer: Karsten Tabelow <karsten.tabelow@wias-berlin.de>
-Depends: R (>= 3.5), awsMethods (>= 1.0), methods
+Depends: R (>= 3.5), awsMethods (>= 1.0), methods, parallel
 Imports: oro.nifti (>= 0.9), stringr, aws (>= 2.4), adimpro (>= 0.9)
 LazyData: TRUE
 Description: Implementation of methods for estimation of quantitative maps
@@ -26,14 +26,14 @@ Description: Implementation of methods for estimation of quantitative maps
 License: GPL (>= 2)
 Copyright: This package is Copyright (C) 2015-2020 Weierstrass
         Institute for Applied Analysis and Stochastics.
-URL: http://www.wias-berlin.de/research/ats/imaging/
+URL: https://www.wias-berlin.de/research/ats/imaging/
 Suggests: covr, testthat, knitr, rmarkdown
 VignetteBuilder: knitr
 RoxygenNote: 6.1.1
 NeedsCompilation: yes
-Packaged: 2020-02-20 09:54:17 UTC; polzehl
+Packaged: 2023-09-06 14:05:47 UTC; polzehl
 Author: Joerg Polzehl [aut],
   Karsten Tabelow [aut, cre],
   WIAS Berlin [cph, fnd]
 Repository: CRAN
-Date/Publication: 2020-02-25 01:20:02 UTC
+Date/Publication: 2023-09-06 15:30:05 UTC

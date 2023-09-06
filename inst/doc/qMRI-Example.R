@@ -3,7 +3,7 @@
 ###################################################
 ### code chunk number 1: 0
 ###################################################
-options(digits=3)
+options(digits=3, warn=0)
 
 
 ###################################################
@@ -48,6 +48,7 @@ mpm <- readMPMData(t1Files, pdFiles, mtFiles,
 ###################################################
 ### code chunk number 6: 5
 ###################################################
+setCores(2)
 modelMPM <- estimateESTATICS(mpm,
                              method = "NLR",
                              verbose = FALSE)
@@ -87,7 +88,7 @@ modelMPMQL <- estimateESTATICS(mpm,
 
 
 ###################################################
-### code chunk number 10: qMRI-Example.Rnw:236-239 (eval = FALSE)
+### code chunk number 10: qMRI-Example.Rnw:237-240 (eval = FALSE)
 ###################################################
 ## ddata <- extract(mpm,"ddata")
 ## mask <- extract(mpm,"mask")
