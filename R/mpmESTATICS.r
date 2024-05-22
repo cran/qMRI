@@ -129,9 +129,9 @@ readMPMData  <-  function(t1Files  = NULL,
   nT1 <- length(t1Files)
   nMT <- length(mtFiles)
   nPD <- length(pdFiles)
-  zerovoxel <- apply(ddata[1:nT1,] <= 0, 2, all)
-  if(model>0) zerovoxel <- zerovoxel|apply(ddata[nT1+nMT+1:nPD,] <= 0, 2, all)
-  if(model==2) zerovoxel <- zerovoxel|apply(ddata[nT1+1:nMT,] <= 0, 2, all)
+  zerovoxel <- apply(ddata[1:nT1,] <= 0, 2, any)
+  if(model>0) zerovoxel <- zerovoxel|apply(ddata[nT1+nMT+1:nPD,] <= 0, 2, any)
+  if(model==2) zerovoxel <- zerovoxel|apply(ddata[nT1+1:nMT,] <= 0, 2, any)
   mask[mask] <- !zerovoxel ## exclude zerovoxel from mask
   ddata <- ddata[, !zerovoxel] ## remove zerovoxel from ddata
 
@@ -338,7 +338,7 @@ estimateESTATICS <- function (mpmdata,
      cat("Start estimation in", nvoxel, "voxel at", format(Sys.time()), "\n")
      if(setCores()==1) pb <- txtProgressBar(0, nvoxel, style = 3)
    }
-if( setCores() >1){
+if( setCores(, reprt=FALSE) >1){
         x <- array(0,c(mpmdata$nFiles+npar+modelp1+2,nvoxel))
         x[mpmdata$nFiles+1:npar,] <- thetas
         x[1:mpmdata$nFiles,] <- mpmdata$ddata/dataScale
@@ -377,7 +377,7 @@ if( setCores() >1){
                                                 start = list(par = th),
                                                 weights = wghts,
                                                 control = list(maxiter = 200,
-                                                               warnOnly = TRUE)))
+                                                               warnOnly = FALSE)), silent = TRUE)
             else try(nls(ivec ~ estatics3QL(par, xmat, CL, sig, L),
                          data = list(xmat = xmat,
                                      CL = CL,
@@ -386,7 +386,7 @@ if( setCores() >1){
                          start = list(par = th),
                          weights = wghts,
                          control = list(maxiter = 200,
-                                        warnOnly = TRUE)))
+                                        warnOnly = FALSE)), silent = TRUE)
             if (inherits(res, "try-error")){
 # retry with port algorithm and bounds
               th <- pmin(upper,pmax(lower,th))
@@ -396,8 +396,8 @@ if( setCores() >1){
                                                   algorithm="port",
                                                   weights = wghts,
                                                   control = list(maxiter = 200,
-                                                                 warnOnly = TRUE),
-                                                  lower=lower, upper=upper))
+                                                                 warnOnly = FALSE),
+                                                  lower=lower, upper=upper), silent = TRUE)
               else try(nls(ivec ~ estatics3QL(par, xmat, CL, sig, L),
                            data = list(xmat = xmat,
                                        CL = CL,
@@ -407,8 +407,8 @@ if( setCores() >1){
                            algorithm="port",
                            weights = wghts,
                            control = list(maxiter = 200,
-                                          warnOnly = TRUE),
-                           lower=lower, upper=upper))
+                                          warnOnly = FALSE),
+                           lower=lower, upper=upper), silent = TRUE)
             }
           } else if (mpmdata$model == 1) {
             res <- if (method == "NLR") try(nls(ivec ~ estatics2(par, xmat),
@@ -416,7 +416,7 @@ if( setCores() >1){
                                                 start = list(par = th),
                                                 weights = wghts,
                                                 control = list(maxiter = 200,
-                                                               warnOnly = TRUE)))
+                                                               warnOnly = FALSE)), silent = TRUE)
             else try(nls(ivec ~ estatics2QL(par, xmat, CL, sig, L),
                          data = list(xmat = xmat,
                                      CL = CL,
@@ -425,7 +425,7 @@ if( setCores() >1){
                          start = list(par = th),
                          weights = wghts,
                          control = list(maxiter = 200,
-                                        warnOnly = TRUE)))
+                                        warnOnly = FALSE)), silent = TRUE)
             if (inherits(res, "try-error")){
              # retry with port algorithm and bounds
                   th <- pmin(upper,pmax(lower,th))
@@ -435,8 +435,8 @@ if( setCores() >1){
                                                       algorithm="port",
                                                       weights = wghts,
                                                       control = list(maxiter = 200,
-                                                                     warnOnly = TRUE),
-                                                      lower=lower, upper=upper))
+                                                                     warnOnly = FALSE),
+                                                      lower=lower, upper=upper), silent = TRUE)
                   else try(nls(ivec ~ estatics2QL(par, xmat, CL, sig, L),
                                data = list(xmat = xmat,
                                            CL = CL,
@@ -446,8 +446,8 @@ if( setCores() >1){
                                algorithm="port",
                                weights = wghts,
                                control = list(maxiter = 200,
-                                              warnOnly = TRUE),
-                               lower=lower, upper=upper))
+                                              warnOnly = FALSE),
+                               lower=lower, upper=upper), silent = TRUE)
             }
           } else if (mpmdata$model == 0) {
             res <- if (method == "NLR") try(nls(ivec ~ estatics1(par, xmat),
@@ -455,7 +455,7 @@ if( setCores() >1){
                                                 start = list(par = th),
                                                 weights = wghts,
                                                 control = list(maxiter = 200,
-                                                               warnOnly = TRUE)))
+                                                               warnOnly = FALSE)), silent = TRUE)
             else try(nls(ivec ~ estatics1QL(par, xmat, CL, sig, L),
                          data = list(xmat = xmat,
                                      CL = CL,
@@ -464,7 +464,7 @@ if( setCores() >1){
                          start = list(par = th),
                          weights = wghts,
                          control = list(maxiter = 200,
-                                        warnOnly = TRUE)))
+                                        warnOnly = FALSE)), silent = TRUE)
              if (inherits(res, "try-error")){
 # retry with port algorithm and bounds
                  th <- pmin(upper,pmax(lower,th))
@@ -474,8 +474,8 @@ if( setCores() >1){
                                                      algorithm="port",
                                                      weights = wghts,
                                                      control = list(maxiter = 200,
-                                                                    warnOnly = TRUE),
-                                                     lower=lower, upper=upper))
+                                                                    warnOnly = FALSE),
+                                                     lower=lower, upper=upper), silent = TRUE)
                  else try(nls(ivec ~ estatics1QL(par, xmat, CL, sig, L),
                               data = list(xmat = xmat,
                                           CL = CL,
@@ -485,8 +485,8 @@ if( setCores() >1){
                               algorithm = "port",
                               weights = wghts,
                               control = list(maxiter = 200,
-                                             warnOnly = TRUE),
-                              lower=lower, upper=upper))
+                                             warnOnly = FALSE),
+                              lower=lower, upper=upper), silent = TRUE)
 
               }
           }
@@ -533,8 +533,8 @@ if( setCores() >1){
                                algorithm ="port",
                                weights = wghts,
                                control = list(maxiter = 200,
-                                              warnOnly = TRUE),
-                               lower=lower[1:3], upper=upper[1:3]))
+                                              warnOnly = FALSE),
+                               lower=lower[1:3], upper=upper[1:3]), silent = TRUE)
               else if (mpmdata$model == 1)
                 res <- try(nls(ivec ~ estatics2QLfixedR2(par, xmat, CL, sig, L),
                                data = list(xmat = xmat0,
@@ -545,8 +545,8 @@ if( setCores() >1){
                                algorithm ="port",
                                weights = wghts,
                                control = list(maxiter = 200,
-                                              warnOnly = TRUE),
-                               lower=lower[1:2], upper=upper[1:2]))
+                                              warnOnly = FALSE),
+                               lower=lower[1:2], upper=upper[1:2]), silent = TRUE)
               else if (mpmdata$model == 0)
                 res <- try(nls(ivec ~ estatics1QLfixedR2(par, xmat, CL, sig, L),
                                data = list(xmat = xmat0,
@@ -557,8 +557,8 @@ if( setCores() >1){
                                algorithm ="port",
                                weights = wghts,
                                control = list(maxiter = 200,
-                                              warnOnly = TRUE),
-                               lower=lower[1], upper=upper[1]))
+                                              warnOnly = FALSE),
+                               lower=lower[1], upper=upper[1]), silent = TRUE)
               if (!inherits(res,"try-error")) {
                 isConv[xyz] <- as.integer(res$convInfo$isConv)
                 sres <- getnlspars(res)
@@ -841,12 +841,14 @@ imageQI <- function(qi,
 
   if (qi$model == 2) {
     def.par <- par(mfrow = c(2, 2), mar = c(3, 3, 3, 0))
+    on.exit(par(def.par))
     rimage(indx, indy, r2star, zlim = c(0, 0.05), main = "R2star")
     rimage(indx, indy, r1, zlim = c(0.0002, 0.0015), main = "R1")
     rimage(indx, indy, pd, zlim = c(0, 10000), main = "PD")
     rimage(indx, indy, delta, zlim = c(0, 0.03), main = "MT")
   } else {
     def.par <- par(mfrow = c(2, 2), mar = c(3, 3, 3, 0))
+    on.exit(par(def.par))
     rimage(indx, indy, r2star, zlim = c(0, 0.05), main = "R2star")
     rimage(indx, indy, r1, zlim = c(0.0002, 0.0015), main = "R1")
     rimage(indx, indy, pd, zlim = c(0, 10000), main = "PD")

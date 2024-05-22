@@ -1,18 +1,16 @@
 \name{estimateIR}
 \alias{estimateIR}
-%- Also NEED an '\alias' for EACH other topic documented here.
 \title{
 Estimate IRMRI parameters
 }
 \description{
-Parameter estimation ( intensity, relaxation rate, proportion of fluid) in Inversion Recovery MRI data.
+Parameter estimation (intensity, relaxation rate, proportion of fluid) in Inversion Recovery MRI data.
 }
 \usage{
 estimateIR(IRdataobj, TEScale = 100, dataScale = 1000, method = c("NLR", "QL"),
            varest = c("RSS","data"), fixed = TRUE, smoothMethod=c("PAWS","Depth"),
            kstar = 24, alpha = .025, bysegment = TRUE, verbose = TRUE)
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{IRdataobj}{
 4D array of IRMRI signals. First dimension corresponds to Inversion times (InvTime).
@@ -28,7 +26,7 @@ estimateIR(IRdataobj, TEScale = 100, dataScale = 1000, method = c("NLR", "QL"),
   Either \code{"NLS"} for nonlinear least squares (ignores Rician bias) or \code{"QL"} for Quasi-Likelihood. The second option is more accurate but requires additional information and is computationally more expensive.
 }
   \item{varest}{
-  Method to, in case of \code{method="QR"}, estimate \code{sigma}if not provided. Either from residual sums of squares (\code{"RSS"}) or MR signals (\code{"data"}) using function \code{varest} from package {\code{aws}}. Only to be used in case that no image registration was needed as preprocessing.
+  Method to, in case of \code{method="QR"}, estimate \code{sigma}if not provided. Either from residual sums of squares (\code{"RSS"}) or MR signals (\code{"data"}) using function \code{varest} from package \code{aws}. Only to be used in case that no image registration was needed as preprocessing.
 }
 \item{fixed}{
  Should adaptive smoothing performed for Sx and Rx maps and fx maps reestimated afterwards ?
@@ -71,48 +69,60 @@ List of class \code{"IRmixed"} with components
 \item{rsdx}{Residual standard deviations}
 The arrays contain entries for all voxel with \code{segments\%in\%1:3}.
 }
+\references{
+J. Polzehl and K. Tabelow (2023), Magnetic Resonance Brain Imaging:
+Modeling and Data Analysis Using R, 2nd Edition, Chapter 7, Springer, Use R! Series.
+    <doi:10.1007/978-3-031-38949-8_7>.
+
+J. Polzehl and K. Tabelow (2023), Magnetic Resonance Brain Imaging - 
+Modeling and Data Analysis Using R: Code and Data.
+    <doi:10.20347/WIAS.DATA.6>.
+
+}
 \author{
 Karsten Tabelow \email{tabelow@wias-berlin.de}\cr
 J\"org Polzehl \email{polzehl@wias-berlin.de}
 
 }
-
-%% ~Make other sections like Warning with \section{Warning }{....} ~
-
 \seealso{
  \code{\link{estimateIRfluid}}, \code{\link{estimateIRsolid}}, \code{\link{estimateIRsolidfixed}},\code{\link{smoothIRSolid}}
-%% ~~objects to See Also as \code{\link{help}}, ~~~
 }
 \examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
-
-## The function is currently defined as
-function (IRdata, InvTimes, segments, fixed = TRUE, smoothMethod = c("Depth", 
-    "PAWS"), bw = 5, TEScale = 100, dataScale = 1000, method = c("NLR", 
-    "QL"), sigma = NULL, L = 1, maxR2star = 50, varest = c("RSS", 
-    "data"), verbose = TRUE) 
-{
-    ergsFluid <- estimateIRfluid(IRdata, InvTimes, segments)
-    Sfluid <- median(ergsFluid$Sfluid)
-    Rfluid <- median(ergsFluid$Rfluid)
-    ergsBrain <- erstimateIRsolid(IRdata, InvTimes, segments, 
-        Sfluid, Rfluid)
-    if (fixed) {
-        if (smmothMethod == "Depth") stop("not yet implemented")
-#            ergsSmooth <- SdepthSmooth(ergsBrain, segments)
-        if (smmothMethod == "PAWS") 
-            ergsSmooth <- vpawscov2(ergsBrain, segments)
-    }
-    ergsSmooth
-  }
+\donttest{
+## runs about 30 seconds
+dataDir0 <- system.file("extdataIR", package = "qMRI")
+dataDir <- tempdir("IRdata")
+library(oro.nifti)
+library(qMRI)
+segm <- readNIfTI(file.path(dataDir0,"Brainweb_segm"))
+Sf <- 900
+Rf <- 0.000285
+Sgm <- 400
+Rgm <- 0.00075
+fgm <- .15
+Swm <- 370
+Rwm <- 0.0011
+fwm <- .05
+InvTimes0 <- c(100, 200, 400, 600, 800, 1200, 1600, 2000, 2500, 3000, 
+              3500, 4000, 4500, 5000, 6000, 15000)
+nTimes <- length(InvTimes0)
+sigma <- 40
+## generate IR signal
+IRdata <- generateIRData(segm, c(Sf,Rf), c(fgm,Rgm,Sgm), c(fwm,Rwm,Swm), InvTimes0, sigma)
+for(i in 1:9) writeNIfTI(as.nifti(IRdata[i,,,]), 
+                         file.path(dataDir,paste0("IR0",i)))
+for(i in 10:nTimes) writeNIfTI(as.nifti(IRdata[i,,,]), 
+                         file.path(dataDir,paste0("IR",i)))
+## generate IRdata object
+t1Files <- list.files(dataDir,"*.nii.gz",full.names=TRUE)
+segmFile <- file.path(dataDir0,"Brainweb_segm")
+IRdata <- readIRData(t1Files, InvTimes0, segmFile, sigma=sigma,
+                     L=1, segmCodes=c("CSF","GM","WM"))
+## estimate all
+sIRmix <- estimateIR(IRdata, method="QL")
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory (show via RShowDoc("KEYWORDS")):
+
+}
  \keyword{ models }
  \keyword{ regression }
-% Use only one keyword per line.
-% For non-standard keywords, use \concept instead of \keyword:
  \concept{ IRMRI }
-% Use only one concept per line.

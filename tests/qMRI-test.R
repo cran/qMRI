@@ -1,4 +1,6 @@
-library(qMRI)
+old <- options(warn=1)
+on.exit(options(old))
+suppressMessages(library(qMRI))
 dataDir <- system.file("extdata",package="qMRI")
 #
 #  set file names for T1w, MTw and PDw images
@@ -25,7 +27,6 @@ FA <- c(rep(21, 8), rep(6, 6), rep(6, 8))
 #
 #   read MPM example data
 #
-library(qMRI)
 mpm <- readMPMData(t1Files, pdFiles, mtFiles,
                    maskFile, TR = TR, TE = TE,
                    FA = FA, verbose = FALSE)

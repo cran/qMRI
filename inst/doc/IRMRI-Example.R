@@ -3,7 +3,8 @@
 ###################################################
 ### code chunk number 1: 0
 ###################################################
-options(digits=3)
+old <- options(digits=3)
+on.exit(options(old))
 
 
 ###################################################
@@ -110,7 +111,8 @@ sIRmix <- estimateIRsolidfixed(sIRmix, verbose=FALSE)
 ###################################################
 ### code chunk number 11: 9
 ###################################################
-par(mfrow=c(1,4),mar=c(3,3,3,.5),mgp=c(2,1,0))
+oldpar <- par(mfrow=c(1,4),mar=c(3,3,3,.5),mgp=c(2,1,0))
+on.exit(par(oldpar))
 library(adimpro)
 rimage(segm[,,2])
 title("Segmentation")

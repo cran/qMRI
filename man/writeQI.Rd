@@ -1,6 +1,5 @@
 \name{writeQI}
 \alias{writeQI}
-%- Also NEED an '\alias' for EACH other topic documented here.
 \title{
 Write estimated maps  in standardized form as NIfTI files.
 }
@@ -12,7 +11,6 @@ as compressed NIfTI files into directory the specified directory.
 \usage{
 writeQI(qi, dir = NULL, prefix="qmap", verbose = TRUE)
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{qi}{
   Object of class 'qMaps' as returned from function
@@ -30,6 +28,15 @@ logical - provide information on progress
 }
 \value{
 The function returns \code{NULL}
+}
+\references{
+J. Polzehl and K. Tabelow (2023), Magnetic Resonance Brain Imaging:
+Modeling and Data Analysis Using R, 2nd Edition, Chapter 6, Springer, Use R! Series.
+    <doi:10.1007/978-3-031-38949-8_6>.
+
+J. Polzehl and K. Tabelow (2023), Magnetic Resonance Brain Imaging - 
+Modeling and Data Analysis Using R: Code and Data.
+    <doi:10.20347/WIAS.DATA.6>.
 }
 \author{
 Karsten Tabelow \email{tabelow@wias-berlin.de}\cr
@@ -81,6 +88,7 @@ modelMPM <- estimateESTATICS(mpm, method = "NLR")
 if(require(adimpro)){
 rimage.options(zquantiles=c(.01,.99), ylab="z")
 oldpar <- par(mfrow=c(2,2),mar=c(3,3,3,1),mgp=c(2,1,0))
+on.exit(par(oldpar))
 pnames <- c("T1","MT","PD","R2star")
 modelCoeff <- extract(modelMPM,"modelCoeff")
 for(i in 1:4){
@@ -110,6 +118,4 @@ for (i in 1:4) rimage(qmap[[i]][,11,],main=nmaps[i])
 writeQI(qMRIMaps, dir=outDir, prefix="qmap")
 par(oldpar)
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
-\keyword{ IO }% use one of  RShowDoc("KEYWORDS")
+\keyword{ IO }

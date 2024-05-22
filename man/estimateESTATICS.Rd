@@ -1,6 +1,5 @@
 \name{estimateESTATICS}
 \alias{estimateESTATICS}
-%- Also NEED an '\alias' for EACH other topic documented here.
 \title{
  Estimate parameters in the ESTATICS model.
 }
@@ -17,7 +16,6 @@ estimateESTATICS(mpmdata, TEScale = 100, dataScale = 1000, method = c("NLR", "QL
                  sigma = NULL, L = 1, maxR2star = 50,
                  varest = c("RSS", "data"), verbose = TRUE)
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{mpmdata}{
    Object of class MPMData as created by \code{\link{readMPMData}}.
@@ -82,8 +80,13 @@ PD(*), MT, and R2(*) at 3T: a multi-center validation. Front Neurosci,
 Wellcome Trust Centre for Neuroimaging, UCL Institute of Neurology,
 University College London, UK., 2013, 7, 95
 
-J. Polzehl, K. Tabelow (2019). Magnetic Resonance Brain Imaging:
-Modeling and Data Analysis Using R. Springer, Use R! series. Doi:10.1007/978-3-030-29184-6.
+J. Polzehl and K. Tabelow (2023), Magnetic Resonance Brain Imaging:
+Modeling and Data Analysis Using R, 2nd Edition, Chapter 6, Springer, Use R! Series.
+    <doi:10.1007/978-3-031-38949-8_6>.
+
+J. Polzehl and K. Tabelow (2023), Magnetic Resonance Brain Imaging - 
+Modeling and Data Analysis Using R: Code and Data.
+    <doi:10.20347/WIAS.DATA.6>.
 
 }
 \author{
@@ -138,7 +141,5 @@ modelMPMQL <- estimateESTATICS(mpm, method = "QL",
                   sigma = array(sigma,mpm$sdim), L = 1)
 }
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
-\keyword{ models }% use one of  RShowDoc("KEYWORDS")
-\keyword{ regression }% __ONLY ONE__ keyword per line
+\keyword{ models }
+\keyword{ regression }

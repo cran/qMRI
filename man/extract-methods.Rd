@@ -17,7 +17,6 @@
 \alias{[.IRfluid}
 \alias{[.IRmixed}
 
-%- Also NEED an '\alias' for EACH other topic documented here.
 \title{
 Methods to extract information from objects of class \code{"MPMData"},
 \code{"ESTATICSModel"}, \code{"sESTATICSModel"}, \code{"qMaps"},
@@ -48,7 +47,6 @@ The [-methods can be used to reduce objects of class
 \S3method{[}{IRfluid}(x, i, j, k, ...)
 \S3method{[}{IRmixed}(x, i, j, k, ...)
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{x}{
   object of class \code{"MPMData"}, \code{"ESTATICSModel"}, \code{"sESTATICSModel"}
@@ -75,25 +73,24 @@ The [-methods can be used to reduce objects of class
 }
 \section{Methods}{
 \describe{
-  %\itemize{
   \item{class(x) = "ANY"}{ Returns a warning for \code{extract}}
 
   \item{class(x) = "MPMData"}{
   Depending the occurence of names in \code{what} a list with the specified components
   is returned
   \itemize{
-  \item{"ddata"}{mpm data}
-  \item{"sdim" }{ dimension of image cube }
-  \item{"nFiles" }{ number of images / image files}
-  \item{"t1Files" }{character - filenames of t1Files}
-  \item{"pdFiles" }{character - filenames of  pdFiles}
-  \item{"mtFiles" }{character - filenames of  mtFiles}
-  \item{"model" }{ Number of the ESTATICS model that can be used }
-  \item{"maskFile" }{character - filenames of   maskFile}
-  \item{"mask" }{ mask}
-  \item{"TR" }{ vector of TR values}
-  \item{"TE" }{ vector of TE values}
-  \item{"FA" }{ vector of FA values}
+  \item ddata: mpm data
+  \item sdim: dimension of image cube
+  \item nFiles: number of images / image files
+  \item t1Files: character - filenames of t1Files
+  \item pdFiles: character - filenames of pdFiles
+  \item mtFiles: character - filenames of mtFiles
+  \item model: Number of the ESTATICS model that can be used
+  \item maskFile: character - filenames of   maskFile
+  \item mask: mask
+  \item TR: vector of TR values
+  \item TE: vector of TE values
+  \item FA: vector of FA values
   }
   }
 
@@ -101,26 +98,26 @@ The [-methods can be used to reduce objects of class
   Depending the occurence of names in \code{what} a list with the specified components
   is returned
   \itemize{
-  \item{"modelCoeff"}{Estimated parameter maps}
-  \item{"invCov" }{ map of inverse covariance matrices}
-  \item{"rsigma"}{map of residual standard deviations}
-  \item{"isConv" }{ convergence indicator map}
-  \item{"isThresh"}{ logical map indicating where \code{R2star==maxR2star}. }
-  \item{"sdim" }{ image dimension}
-  \item{"nFiles" }{ number of images}
-  \item{"t1Files" }{ vector of T1 filenames}
-  \item{"pdFiles" }{ vector of PD filenames}
-  \item{"mtFiles" }{ vector of MT filenames}
-  \item{"model" }{ model used (depends on specification of MT files)}
-  \item{"maskFile" }{ filename of brain mask}
-  \item{"mask" }{ brain mask}
-  \item{"sigma" }{ sigma}
-  \item{"L" }{ L}
-  \item{"TR" }{ TR values}
-  \item{"TE" }{ TE values}
-  \item{"FA" }{ Flip angles (FA)}
-  \item{"TEScale" }{ TEScale}
-  \item{"dataScale" }{dataScale}
+  \item modelCoeff: Estimated parameter maps
+  \item invCov: map of inverse covariance matrices
+  \item rsigma: map of residual standard deviations
+  \item isConv: convergence indicator map
+  \item isThresh: logical map indicating where \code{R2star==maxR2star}
+  \item sdim: image dimension
+  \item nFiles: number of images
+  \item t1Files: vector of T1 filenames
+  \item pdFiles: vector of PD filenames
+  \item mtFiles: vector of MT filenames
+  \item model: model used (depends on specification of MT files)
+  \item maskFile: filename of brain mask
+  \item mask: brain mask
+  \item sigma: standard deviation sigma
+  \item L: effective number of receiver coils L
+  \item TR: TR values
+  \item TE: TE values
+  \item FA: Flip angles (FA)
+  \item TEScale: TEScale
+  \item dataScale: dataScale
   }
  }
 
@@ -128,29 +125,29 @@ The [-methods can be used to reduce objects of class
   Depending the occurence of names in \code{what} a list with the specified components
   is returned
   \itemize{
-  \item{"modelCoeff"}{Estimated parameter maps}
-  \item{"invCov" }{ map of inverse covariance matrices}
-  \item{"rsigma"}{ map of residual standard deviations}
-  \item{"isConv" }{ convergence indicator map}
-  \item{"bi"}{ Sum of weights map from AWS/PAWS}
-  \item{"smoothPar"}{ smooting parameters used in AWS/PAWS}
-  \item{"smoothedData"}{ smoothed mpmData}
-  \item{"isThresh"}{ logical map indicating where \code{R2star==maxR2star}. }
-  \item{"sdim" }{ image dimension}
-  \item{"nFiles" }{ number of images}
-  \item{"t1Files" }{ vector of T1 filenames}
-  \item{"pdFiles" }{ vector of PD filenames}
-  \item{"mtFiles" }{ vector of MT filenames}
-  \item{"model" }{ model used (depends on specification of MT files)}
-  \item{"maskFile" }{ filename of brain mask}
-  \item{"mask" }{ brain mask}
-  \item{"sigma" }{ sigma}
-  \item{"L" }{ L}
-  \item{"TR" }{ TR values}
-  \item{"TE" }{ TE values}
-  \item{"FA" }{ Flip angles (FA)}
-  \item{"TEScale" }{ TEScale}
-  \item{"dataScale" }{dataScale}
+  \item modelCoeff: Estimated parameter maps
+  \item invCov: map of inverse covariance matrices
+  \item rsigma: map of residual standard deviations
+  \item isConv: convergence indicator map
+  \item bi: Sum of weights map from AWS/PAWS
+  \item smoothPar: smooting parameters used in AWS/PAWS
+  \item smoothedData: smoothed mpmData
+  \item isThresh: logical map indicating where \code{R2star==maxR2star}
+  \item sdim: image dimension
+  \item nFiles: number of images
+  \item t1Files: vector of T1 filenames
+  \item pdFiles: vector of PD filenames
+  \item mtFiles: vector of MT filenames
+  \item model: model used (depends on specification of MT files)
+  \item maskFile: filename of brain mask
+  \item mask: brain mask
+  \item sigma: sigma
+  \item L: effective number of receiver coils L
+  \item TR: TR values
+  \item TE: TE values
+  \item FA: Flip angles (FA)
+  \item TEScale: TEScale
+  \item dataScale: dataScale
   }
 }
 
@@ -158,16 +155,16 @@ The [-methods can be used to reduce objects of class
   Depending the occurence of names in \code{what} a list with the specified components
   is returned
   \itemize{
-  \item{b1Map }{ b1Map }
-  \item{R1 }{ Estimated map of R1}
-  \item{R2star }{ Estimated map of R2star}
-  \item{PD }{Estimated map of  PD}
-  \item{MT }{Estimated map of  delta (if MT-series was used)}
-  \item{model }{Type of ESTATICS model used}
-  \item{t1Files }{filenames T1}
-  \item{mtFiles }{filenames MT}
-  \item{pdFiles }{filenames PD}
-  \item{mask }{brainmask}
+  \item b1Map: b1Map
+  \item R1: Estimated map of R1
+  \item R2star: Estimated map of R2star
+  \item PD: Estimated map of PD
+  \item MT: Estimated map of delta (if MT-series was used)
+  \item model: Type of ESTATICS model used
+  \item t1Files: filenames T1
+  \item mtFiles: filenames MT
+  \item pdFiles: filenames PD
+  \item mask: brainmask
 }
   }
  }
@@ -176,86 +173,14 @@ The [-methods can be used to reduce objects of class
   A list with components carrying the names of the options specified in
   argument \code{what}.
 }
+\references{
+J. Polzehl and K. Tabelow (2023), Magnetic Resonance Brain Imaging:
+Modeling and Data Analysis Using R, 2nd Edition, Chapter 7, Springer, Use R! Series.
+    <doi:10.1007/978-3-031-38949-8_7>.
+}
 \author{
   Karsten Tabelow \email{tabelow@wias-berlin.de}\cr
   J\"org Polzehl \email{polzehl@wias-berlin.de}
 }
-\examples{
-dataDir <- system.file("extdata",package="qMRI")
-#
-#  set file names for T1w, MTw and PDw images
-#
-t1Names <- paste0("t1w_",1:8,".nii.gz")
-mtNames <- paste0("mtw_",1:6,".nii.gz")
-pdNames <- paste0("pdw_",1:8,".nii.gz")
-t1Files <- file.path(dataDir, t1Names)
-mtFiles <- file.path(dataDir, mtNames)
-pdFiles <- file.path(dataDir, pdNames)
-#
-#  file names of mask and B1 field map
-#
-B1File <- file.path(dataDir, "B1map.nii.gz")
-maskFile <- file.path(dataDir, "mask0.nii.gz")
-#
-#  Acquisition parameters (TE, TR, Flip Angle) for T1w, MTw and PDw images
-#
-TE <- c(2.3, 4.6, 6.9, 9.2, 11.5, 13.8, 16.1, 18.4,
-        2.3, 4.6, 6.9, 9.2, 11.5, 13.8,
-        2.3, 4.6, 6.9, 9.2, 11.5, 13.8, 16.1, 18.4)
-TR <- rep(25, 22)
-FA <- c(rep(21, 8), rep(6, 6), rep(6, 8))
-#
-#   read MPM example data
-#
-library(qMRI)
-mpm <- readMPMData(t1Files, pdFiles, mtFiles,
-                   maskFile, TR = TR, TE = TE,
-                   FA = FA, verbose = FALSE)
-#
-#  display some data
-#
-data <- extract(mpm,"ddata")
-if(require(adimpro)){
-rimage.options(ylab = "z")
-oldpar <- par(mfrow=c(1,3),mar=c(3,3,3,1),mgp=c(2,1,0))
-rimage(data[1,,11,], main="first T1w image")
-rimage(data[9,,11,], main="first MTw image")
-rimage(data[15,,11,], main="first PDw image")
-}
-#
-#  Estimate Parameters in the ESTATICS model
-#
-modelMPM <- estimateESTATICS(mpm, method = "NLR")
-#
-#  Parameter maps and residual standard deviation
-#
-z <- extract(modelMPM,c("rsigma","modelCoeff"))
-if(require(adimpro)){
-rimage.options(ylab = "z")
-par(mfrow=c(1,5),mar=c(3,3,3,1),mgp=c(2,1,0))
-rimage(z$modelCoeff[1,,11,], main="S_T1")
-rimage(z$modelCoeff[2,,11,], main="S_MT")
-rimage(z$modelCoeff[3,,11,], main="S_PD")
-rimage(z$modelCoeff[4,,11,], main="R2star")
-rimage(z$rsigma[,11,], main="Residual sd")
-}
-#
-#  Compute quantitative maps (R1, R2star, PD, MT)
-#
-qMRIMaps <- calculateQI(modelMPM,
-                        b1File = B1File,
-                        TR2 = 3.4)
-#
-#  resulting quantitative maps for central coronal slice
-#
-if(require(adimpro)){
-rimage.options(zquantiles=c(.01,.99), ylab="z")
-par(mfrow=c(2,4),mar=c(3,3,3,1),mgp=c(2,1,0))
-nmaps <- c("R1","R2star","PD","MT")
-qmap <- extract(qMRIMaps,nmaps)
-for (i in 1:4) rimage(qmap[[i]][,11,],main=nmaps[i])
-}
-par(oldpar)
-}
-\keyword{ methods }% use one of  RShowDoc("KEYWORDS")
-\keyword{ manip }% __ONLY ONE__ keyword per line
+\keyword{ methods }
+\keyword{ manip }

@@ -3,7 +3,8 @@
 ###################################################
 ### code chunk number 1: 0
 ###################################################
-options(digits=3, warn=0)
+old <- options(digits=3, warn=0)
+on.exit(options(old))
 
 
 ###################################################
@@ -88,7 +89,7 @@ modelMPMQL <- estimateESTATICS(mpm,
 
 
 ###################################################
-### code chunk number 10: qMRI-Example.Rnw:237-240 (eval = FALSE)
+### code chunk number 10: qMRI-Example.Rnw:238-241 (eval = FALSE)
 ###################################################
 ## ddata <- extract(mpm,"ddata")
 ## mask <- extract(mpm,"mask")
@@ -113,8 +114,9 @@ modelMPMQL <- estimateESTATICS(mpm,
 ###################################################
 library(adimpro)
 rimage.options(zquantiles = c(.01, .99), ylab = "z")
-par(mfrow = c(2, 4),
-    mar = c(3, 3, 3, 1), mgp = c(2, 1, 0))
+oldpar <- par(mfrow = c(2, 4),
+              mar = c(3, 3, 3, 1), mgp = c(2, 1, 0))
+on.exit(par(oldpar))
 pnames <- c("T1", "MT", "PD", "R2star")
 for (i in 1:4) {
   modelCoeff <- extract(modelMPMQL,"modelCoeff")

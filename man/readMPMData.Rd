@@ -1,6 +1,5 @@
 \name{readMPMData}
 \alias{readMPMData}
-%- Also NEED an '\alias' for EACH other topic documented here.
 \title{
 Read experimental Multi-Parameter Mapping (MPM) data.
 }
@@ -11,7 +10,6 @@ The function reads data generated in Multimodal Parameter Mapping (MPM) experime
 readMPMData(t1Files = NULL, pdFiles = NULL, mtFiles = NULL, maskFile = NULL,
             TR = NULL, TE = NULL, FA = NULL, wghts = NULL, verbose = TRUE)
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{t1Files}{
     Vector of filenames corresponding to T1 weighted images (in Nifti-Format) with varying TE
@@ -66,16 +64,19 @@ PD(*), MT, and R2(*) at 3T: a multi-center validation. Front Neurosci,
 Wellcome Trust Centre for Neuroimaging, UCL Institute of Neurology,
 University College London, UK., 2013, 7, 95
 
-J. Polzehl, K. Tabelow (2019). Magnetic Resonance Brain Imaging:
-Modeling and Data Analysis Using R. Springer, Use R! series. Doi:10.1007/978-3-030-29184-6.
+J. Polzehl and K. Tabelow (2023), Magnetic Resonance Brain Imaging:
+Modeling and Data Analysis Using R, 2nd Edition, Chapter 6, Springer, Use R! Series.
+    <doi:10.1007/978-3-031-38949-8_6>.
+
+J. Polzehl and K. Tabelow (2023), Magnetic Resonance Brain Imaging - 
+Modeling and Data Analysis Using R: Code and Data.
+    <doi:10.20347/WIAS.DATA.6>.
+
 }
 \author{
 Karsten Tabelow \email{tabelow@wias-berlin.de}\cr
 J\"org Polzehl \email{polzehl@wias-berlin.de}
 }
-
-%% ~Make other sections like Warning with \section{Warning }{....} ~
-
 \seealso{
 \code{\link{estimateESTATICS}}, \code{\link{calculateQI}},
 \code{\link{smoothESTATICS}}, \code{\link{writeESTATICS}},
@@ -113,7 +114,4 @@ mpm <- readMPMData(t1Files, pdFiles, mtFiles,
                    maskFile, TR = TR, TE = TE,
                    FA = FA, verbose = FALSE)
 }
-
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
-\keyword{ IO }% use one of  RShowDoc("KEYWORDS")
+\keyword{ IO }

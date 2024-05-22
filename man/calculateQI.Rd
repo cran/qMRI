@@ -1,6 +1,5 @@
 \name{calculateQI}
 \alias{calculateQI}
-%- Also NEED an '\alias' for EACH other topic documented here.
 \title{
 Obtain quantitative maps from estimated ESTATICS parameters.
 }
@@ -14,7 +13,6 @@ of a second recovery delay TR2 in case of Dual-Exitation FLASH measurements
 \usage{
 calculateQI(mpmESTATICSModel, b1File = NULL, TR2 = 0, verbose = TRUE)
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{mpmESTATICSModel}{
   Object of class 'ESTATICSModel' as returned from function \code{\link{estimateESTATICS}}.
@@ -56,22 +54,24 @@ a multi-center validation. Front Neurosci,
 Wellcome Trust Centre for Neuroimaging, UCL Institute of Neurology,
 University College London, UK., 2013, 7, 95
 
-J. Polzehl, K. Tabelow (2019). Magnetic Resonance Brain Imaging:
-Modeling and Data Analysis Using R. Springer, Use R! series. Doi:10.1007/978-3-030-29184-6.
-}
+J. Polzehl and K. Tabelow (2023), Magnetic Resonance Brain Imaging:
+Modeling and Data Analysis Using R, 2nd Edition, Chapter 6, Springer, Use R! Series.
+    <doi:10.1007/978-3-031-38949-8_6>.
+
+  J. Polzehl and K. Tabelow (2023), Magnetic Resonance Brain Imaging - 
+Modeling and Data Analysis Using R: Code and Data.
+    <doi:10.20347/WIAS.DATA.6>.
+    }
 \author{
 Karsten Tabelow \email{tabelow@wias-berlin.de}\cr
 J\"org Polzehl \email{polzehl@wias-berlin.de}
 }
-
-%% ~Make other sections like Warning with \section{Warning }{....} ~
-
 \seealso{
 \code{\link{readMPMData}}, \code{\link{estimateESTATICS}},
 \code{\link{smoothESTATICS}}, \code{\link{writeESTATICS}},
 \code{\link[aws]{awsLocalSigma}}
 }
-\keyword{ models }% use one of  RShowDoc("KEYWORDS")
+\keyword{ models }
 
 \examples{
 dataDir <- system.file("extdata",package="qMRI")
@@ -118,6 +118,7 @@ modelMPM <- estimateESTATICS(mpm, method = "NLR")
 if(require(adimpro)){
 rimage.options(zquantiles=c(.01,.99), ylab="z")
 oldpar <- par(mfrow=c(2,2),mar=c(3,3,3,1),mgp=c(2,1,0))
+on.exit(par(oldpar))
 pnames <- c("T1","MT","PD","R2star")
 modelCoeff <- extract(modelMPM,"modelCoeff")
 for(i in 1:4){
@@ -145,5 +146,3 @@ for (i in 1:4){
 par(oldpar)
 }
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
