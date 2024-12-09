@@ -1,8 +1,8 @@
 Package: qMRI
 Type: Package
 Title: Methods for Quantitative Magnetic Resonance Imaging ('qMRI')
-Version: 1.2.7.6
-Date: 2024-05-17
+Version: 1.2.7.8
+Date: 2024-12-09
 Authors@R: c(person("Joerg", "Polzehl", role = c("aut"),
                     email = "joerg.polzehl@wias-berlin.de"),
              person("Karsten", "Tabelow", role = c("aut", "cre"),
@@ -29,9 +29,9 @@ Suggests: covr, testthat, knitr, rmarkdown
 VignetteBuilder: knitr
 RoxygenNote: 6.1.1
 NeedsCompilation: yes
-Packaged: 2024-05-22 08:40:06 UTC; tabelow
+Packaged: 2024-12-09 09:19:27 UTC; tabelow
 Author: Joerg Polzehl [aut],
   Karsten Tabelow [aut, cre],
   WIAS Berlin [cph, fnd]
 Repository: CRAN
-Date/Publication: 2024-05-22 21:20:03 UTC
+Date/Publication: 2024-12-09 12:20:05 UTC

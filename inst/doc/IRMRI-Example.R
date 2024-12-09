@@ -99,7 +99,7 @@ IRmix <- estimateIRsolid(IRfluid, verbose=FALSE)
 ###################################################
 ### code chunk number 9: 7
 ###################################################
-sIRmix <- smoothIRSolid(IRmix, alpha=1e-4, verbose=FALSE)
+sIRmix <- smoothIRSolid(IRmix, alpha=1e-4, verbose=FALSE,partial=FALSE)
 
 
 ###################################################
