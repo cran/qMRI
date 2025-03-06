@@ -11,7 +11,7 @@ on.exit(options(old))
 ### code chunk number 2: 0b
 ###################################################
 dataDir0 <- system.file("extdataIR", package = "qMRI")
-dataDir <- tempdir("IRdata")
+dataDir <- tempdir()
 library(oro.nifti)
 
 
